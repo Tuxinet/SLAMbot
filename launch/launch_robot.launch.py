@@ -34,6 +34,15 @@ def generate_launch_description():
     # Include the Gazebo launch file, provided by the gazebo_ros package
 
 
+    twist_mux_params = os.path.join(get_package_share_directory(package_name),'config','twist_mux.yaml')
+    twist_mux = Node(
+            package="twist_mux",
+            executable="twist_mux",
+            parameters=[twist_mux_params],
+            remappings=[('/cmd_vel_out','/diff_cont/cmd_vel_unstamped')]
+        )
+
+    # ros2 launch slam_toolbox online_async_launch.py params_file:=./src/slambot/config/map_params_online_async.yaml use_sim_time:=true
 
     robot_description = Command(['ros2 param get --hide-type /robot_state_publisher robot_description'])
     
@@ -85,6 +94,7 @@ def generate_launch_description():
             description='Use gazebo control if false'),
 
         rsp,
+        twist_mux,
         delayed_controller_manager,
         delayed_diff_drive_spawner,
         delayed_joint_broad_spawner
